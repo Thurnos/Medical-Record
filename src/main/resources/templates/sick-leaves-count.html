@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medical Record System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+    }
+    nav {
+      background-color: #007bff;
+      padding: 10px;
+      text-align: center;
+    }
+    nav ul {
+      list-style: none;
+      padding: 0;
+    }
+    nav ul li {
+      display: inline;
+      margin: 0 15px;
+    }
+    nav ul li a {
+      color: white;
+      text-decoration: none;
+      font-size: 18px;
+    }
+    footer {
+      background-color: #007bff;
+      padding: 10px;
+      text-align: center;
+      color: white;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+    .container {
+      padding: 20px;
+      margin-top: 60px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    select, button {
+      font-size: 16px;
+      padding: 8px;
+      margin: 10px 0;
+    }
+    #doctorLeaveCount {
+      font-size: 18px;
+      font-weight: bold;
+      color: #007bff;
+    }
+    #message {
+      color: red;
+      font-weight: bold;
+    }
+    .loading {
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+  <ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="/visits">Visits</a></li>
+    <li><a href="/sick-leaves">Sick Leaves</a></li>
+  </ul>
+</nav>
+
+<!-- Main content -->
+<div class="container">
+  <h1>Doctor Sick Leave Counts</h1>
+
+  <!-- Dropdown for selecting a doctor -->
+  <label for="doctorSelect">Select a doctor:</label>
+  <select id="doctorSelect">
+    <option value="">Select Doctor</option>
+  </select>
+
+  <button onclick="fetchSickLeaveCount()">Get Sick Leave Count</button>
+
+  <div id="doctorLeaveCount"></div> <!-- Display the sick leave count -->
+
+  <p id="message" style="display:none;"></p> <!-- Loading or error message -->
+
+</div>
+
+<!-- Footer -->
+<footer>
+  <p>&copy; 2024 Medical Record System. All Rights Reserved.</p>
+</footer>
+
+<script>
+  // Fetching doctor names and populating the dropdown
+  function fetchDoctors() {
+    fetch('/api/doctors')
+            .then(response => response.json())
+            .then(data => {
+              const doctorSelect = document.getElementById('doctorSelect');
+              data.forEach(doctor => {
+                const option = document.createElement('option');
+                option.value = doctor.id;  // doctor.id should be used as the value
+                option.textContent = doctor.name;  // doctor.name will be the name displayed in the dropdown
+                doctorSelect.appendChild(option);
+              });
+            })
+            .catch(error => console.error('Error fetching doctors:', error));
+  }
+
+  // Fetching sick leave count for the selected doctor
+  function fetchSickLeaveCount() {
+    const doctorId = document.getElementById('doctorSelect').value;
+    const message = document.getElementById('message');
+
+    if (!doctorId) {
+      alert('Please select a doctor.');
+      return;
+    }
+
+    message.style.display = 'none';
+
+    message.textContent = 'Loading...';
+    message.style.display = 'block';
+    message.classList.remove('error');
+    message.classList.add('loading');
+
+    // Make the API request with the selected doctorId
+    fetch(`/api/sick-leaves/doctor-sick-leave-counts?doctorId=${doctorId}`)
+            .then(response => response.json())
+            .then(data => {
+              const doctorLeaveCount = document.getElementById('doctorLeaveCount');
+              doctorLeaveCount.innerHTML = '';
+
+              // If data is empty, show an error message
+              if (data.length === 0) {
+                message.textContent = 'No sick leaves found for the selected doctor.';
+                message.classList.remove('loading');
+                message.classList.add('error');
+                return;
+              }
+
+              // Display the sick leave count (assuming your API returns [doctorName, sickLeaveCount])
+              const countText = `${data[0][0]} has ${data[0][1]} sick leave(s)`;
+              doctorLeaveCount.textContent = countText;
+
+              message.style.display = 'none';
+            })
+            .catch(error => {
+              console.error('Error fetching sick leave count:', error);
+              message.textContent = 'Failed to load sick leave count.';
+              message.classList.remove('loading');
+              message.classList.add('error');
+              message.style.display = 'block';
+            });
+  }
+
+  // Call fetchDoctors when the page loads
+  window.onload = fetchDoctors;
+</script>
+
+</body>
+</html>

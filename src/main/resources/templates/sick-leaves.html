@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Month with Highest Sick Leaves</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f7f6;
+    }
+    .container {
+      width: 80%;
+      margin: 0 auto;
+    }
+    .header {
+      background-color: #1E3A8A;
+      color: white;
+      padding: 10px 0;
+      text-align: center;
+    }
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .card h3 {
+      color: #1E3A8A;
+    }
+    .card p {
+      color: #333;
+      font-size: 18px;
+    }
+    .footer {
+      background-color: #1E3A8A;
+      color: white;
+      padding: 10px 0;
+      text-align: center;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+<!-- Navbar (same as always) -->
+<div class="header">
+  <h1>Medical Record System</h1>
+</div>
+
+<!-- Main content -->
+<div class="container">
+  <h2>Month with Highest Sick Leaves</h2>
+  <div class="card">
+    <h3 id="month-name">Loading...</h3>
+    <p id="sick-leave-count">Loading...</p>
+  </div>
+</div>
+
+<!-- Footer (same as always) -->
+<div class="footer">
+  <p>&copy; 2024 Medical Record System</p>
+</div>
+
+<script>
+  // Fetch data from the API and display the result
+  fetch('/api/sick-leaves/most-sick-leaves-month')
+          .then(response => response.json())
+          .then(data => {
+            // Assuming data[0] is the month name and data[1] is the sick leave count
+            document.getElementById('month-name').textContent = `Month: ${data[0]}`;
+            document.getElementById('sick-leave-count').textContent = `Sick Leaves: ${data[1]}`;
+          })
+          .catch(error => {
+            console.error('Error fetching data:', error);
+            document.getElementById('month-name').textContent = 'Error fetching data';
+            document.getElementById('sick-leave-count').textContent = '';
+          });
+</script>
+</body>
+</html>

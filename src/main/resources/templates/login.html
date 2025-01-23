@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .error-message {
+      color: red;
+      margin-top: 1rem;
+    }
+
+    .success-message {
+      color: green;
+      margin-top: 1rem;
+    }
+
+    .verification {
+      text-align: center;
+      margin-top: 1rem;
+    }
+  </style>
+  <script>
+    // Generate a random math question
+    let correctAnswer;
+
+    function generateQuestion() {
+      const num1 = Math.floor(Math.random() * 50) + 1; // Random number between 1 and 50
+      const num2 = Math.floor(Math.random() * 50) + 1;
+      const operators = ["+", "-", "*"];
+      const operator = operators[Math.floor(Math.random() * operators.length)];
+
+      // Generate question and calculate the correct answer
+      let question;
+      if (operator === "+") {
+        question = `${num1} + ${num2}`;
+        correctAnswer = num1 + num2;
+      } else if (operator === "-") {
+        question = `${num1} - ${num2}`;
+        correctAnswer = num1 - num2;
+      } else if (operator === "*") {
+        question = `${num1} * ${num2}`;
+        correctAnswer = num1 * num2;
+      }
+
+      document.getElementById("math-question").textContent = `Solve: ${question}`;
+    }
+
+    // Validate the user's answer
+    function validateMathQuestion(event) {
+      const userAnswer = document.getElementById("math-answer").value;
+      if (parseInt(userAnswer) !== correctAnswer) {
+        event.preventDefault();
+        alert("Incorrect answer. Please try again.");
+        generateQuestion(); // Generate a new question if the answer is wrong
+        document.getElementById("math-answer").value = ""; // Clear the input field
+      }
+    }
+
+    // Initialize the question when the page loads
+    window.onload = function () {
+      generateQuestion();
+    };
+  </script>
+</head>
+<body>
+<div class="login-container">
+  <h1>Login</h1>
+  <form th:action="@{/login}" method="post" onsubmit="validateMathQuestion(event)">
+    <div class="form-group">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required />
+    </div>
+    <div class="form-group">
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required />
+    </div>
+
+    <!-- Dynamic Math Verification -->
+    <div class="verification">
+      <label id="math-question"></label>
+      <input type="text" id="math-answer" placeholder="Enter your answer" required />
+    </div>
+
+    <div>
+      <button type="submit">Login</button>
+    </div>
+
+    <!-- Display error message if login fails -->
+    <div th:if="${param.error}" class="error-message">
+      Invalid username, password, or verification.
+    </div>
+
+    <!-- Display message if user is logged out -->
+    <div th:if="${param.logout}" class="success-message">
+      You have been logged out successfully.
+    </div>
+  </form>
+</div>
+</body>
+</html>

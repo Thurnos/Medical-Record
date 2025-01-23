@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Doctor Patient Counts</title>
+</head>
+<body>
+<!-- Include the navbar -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<h1>Doctor Patient Counts</h1>
+
+<!-- Dropdown to select doctor -->
+<form id="doctorForm" method="get">
+    <label for="doctorSelect">Select a Doctor: </label>
+    <select name="doctorName" id="doctorSelect">
+        <option value="">--Select a Doctor--</option>
+        <!-- Loop through doctors and display their names -->
+        <option th:each="doctor : ${doctors}"
+                th:value="${doctor.name}"
+                th:text="${doctor.name}"></option>
+    </select>
+    <button type="button" onclick="getPatientCount()">Get Patient Count</button>
+</form>
+
+<!-- Display the patient count for selected doctor -->
+<div id="patientCountDiv">
+    <h2>Patient Count for Selected Doctor:</h2>
+    <p id="patientCount">Please select a doctor.</p>
+</div>
+
+<!-- Include the footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script>
+    function getPatientCount() {
+        var doctorName = document.getElementById("doctorSelect").value;
+        if (doctorName === "") {
+            alert("Please select a doctor.");
+            return;
+        }
+
+        // Use the correct API endpoint for fetching the patient count
+        fetch(`/doctors/patient-counts?doctorName=${doctorName}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    var count = data[0][1]; // Assuming doctor name is at index 0, patient count at index 1
+                    document.getElementById("patientCount").textContent = "Patient Count: " + count;
+                } else {
+                    document.getElementById("patientCount").textContent = "No patients assigned.";
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching patient count:", error);
+                alert("Failed to fetch patient count.");
+            });
+    }
+</script>
+</body>
+</html>

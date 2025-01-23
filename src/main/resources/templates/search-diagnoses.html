@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Diagnoses</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #e6f2ff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background-color: #007BFF;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Container */
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 700px;
+            margin: 30px auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007BFF;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        /* Search Form */
+        .search-form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .search-form input {
+            width: 70%;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-right: 10px;
+        }
+
+        .search-form button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .search-form button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Results Section */
+        #results {
+            margin-top: 20px;
+        }
+
+        .result-item {
+            background: #f0f8ff;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-item p {
+            margin: 5px 0;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .result-item strong {
+            color: #007BFF;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<div class="navbar">
+    <a href="/">Home</a>
+    <a href="/patients">Patients</a>
+    <a href="/diagnoses">Most Frequent Diagnoses</a>
+    <a href="/diagnoses/search">Search Diagnoses</a>
+</div>
+
+<!-- Main Container -->
+<div class="container">
+    <h1>Search Diagnoses</h1>
+    <form class="search-form" onsubmit="return false;">
+        <input type="text" id="diagnosis-input" placeholder="Enter a diagnosis..." required>
+        <button id="search-button">Search</button>
+    </form>
+
+    <div id="results">
+        <!-- Search results will appear here -->
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <p>&copy; 2024 Medical Record System. All Rights Reserved.</p>
+</div>
+
+<script>
+    document.getElementById('search-button').addEventListener('click', () => {
+        const diagnosisText = document.getElementById('diagnosis-input').value;
+
+        if (!diagnosisText.trim()) {
+            alert('Please enter a diagnosis to search!');
+            return;
+        }
+
+        fetch(`/api/diagnoses/patients-diagnoses?diagnosisText=${encodeURIComponent(diagnosisText)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data. Please try again.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('API Response:', data); // Debugging step
+                const resultsContainer = document.getElementById('results');
+                resultsContainer.innerHTML = ''; // Clear previous results
+
+                if (data.length === 0) {
+                    resultsContainer.innerHTML = '<p>No patients found for this diagnosis.</p>';
+                    return;
+                }
+
+                // Render results
+                data.forEach(item => {
+                    const [patient, diagnosis] = item; // Destructure the array
+                    const div = document.createElement('div');
+                    div.classList.add('result-item');
+
+                    // Use correct property names to display patient and diagnosis information
+                    div.innerHTML = `
+                    <p><strong>Patient Name:</strong> ${patient.name}</p>
+                    <p><strong>Diagnosis Text:</strong> ${diagnosis.diagnosisText}</p>
+                `;
+                    resultsContainer.appendChild(div);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultsContainer = document.getElementById('results');
+                resultsContainer.innerHTML = '<p>Failed to fetch results. Please try again later.</p>';
+            });
+    });
+
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reporting Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #e6f2ff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .navbar {
+      background-color: #007BFF;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 800px;
+      margin: 30px auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #007BFF;
+      font-size: 2.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table th, table td {
+      border: 1px solid #ccc;
+      text-align: left;
+      padding: 10px;
+    }
+
+    table th {
+      background-color: #007BFF;
+      color: white;
+    }
+
+    table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .action-buttons button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      margin-right: 5px;
+      cursor: pointer;
+    }
+
+    .action-buttons button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+<div class="navbar">Reporting Dashboard</div>
+<div class="container">
+  <h1>System Statistics</h1>
+  <table id="statisticsTable">
+    <thead>
+    <tr>
+      <th>Total Visits</th>
+      <th>Total Diagnoses</th>
+      <th>Total Treatments</th>
+      <th>Unique Patients</th>
+      <th>Unique Doctors</th>
+      <th>Long Diagnoses (>100 characters)</th>
+      <th>Earliest Visit Date</th>
+      <th>Latest Visit Date</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr id="statisticsRow">
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  // Fetch the statistics data from the backend
+  fetch('/api/reporting/statistics')
+          .then(response => response.json())
+          .then(data => {
+            const statsRow = document.getElementById('statisticsRow');
+            statsRow.innerHTML = `
+          <td>${data.totalVisits}</td>
+          <td>${data.totalDiagnoses}</td>
+          <td>${data.totalTreatments}</td>
+          <td>${data.uniquePatients}</td>
+          <td>${data.uniqueDoctors}</td>
+          <td>${data.longDiagnoses}</td>
+          <td>${data.earliestVisitDate}</td>
+          <td>${data.latestVisitDate}</td>
+        `;
+          })
+          .catch(error => console.error('Error fetching statistics:', error));
+</script>
+</body>
+</html>

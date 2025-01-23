@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Patients by Doctor</title>
+  <link rel="stylesheet" href="/css/styles.css"> <!-- Optional: Add your styles -->
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #e6f2ff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .navbar {
+      background-color: #007BFF;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 800px;
+      margin: 30px auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #007BFF;
+      font-size: 2.5rem;
+    }
+
+    .patient-selection {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .patient-selection select {
+      padding: 10px;
+      font-size: 16px;
+      margin-right: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .patient-selection button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .patient-selection button:hover {
+      background-color: #0056b3;
+    }
+
+    .history-container {
+      margin-top: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table th, table td {
+      border: 1px solid #ccc;
+      text-align: left;
+      padding: 10px;
+    }
+
+    table th {
+      background-color: #007BFF;
+      color: white;
+    }
+
+    table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    table tr:hover {
+      background-color: #f9f9f9;
+    }
+
+    #noPatientsMessage {
+      text-align: center;
+      font-size: 18px;
+      color: #e74c3c;
+      font-weight: bold;
+    }
+
+    #patientsTitle {
+      display: none;
+      margin-top: 20px;
+      font-size: 20px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+<div class="navbar">
+  Patients by Doctor
+</div>
+
+<div class="container">
+  <h1>Search Patients by Doctor</h1>
+
+  <!-- Search Form -->
+  <form id="doctorSearchForm" class="patient-selection">
+    <label for="doctorName">Select Doctor:</label>
+    <select id="doctorName" name="doctorName" required>
+      <option value="" disabled selected>Select a doctor</option>
+      <option th:each="doctor : ${doctors}" th:value="${doctor.name}" th:text="${doctor.name}"></option>
+    </select>
+    <button type="submit">Search</button>
+  </form>
+
+  <!-- Display Results -->
+  <h2 id="patientsTitle">Patients for Doctor: <span id="doctorNameDisplay"></span></h2>
+  <p id="noPatientsMessage" style="display:none">No patients found for the selected doctor.</p>
+
+  <table id="patientsTable" style="display:none">
+    <thead>
+    <tr>
+      <th>Patient Name</th>
+    </tr>
+    </thead>
+    <tbody id="patientsBody">
+    </tbody>
+  </table>
+</div>
+<script>
+  // JavaScript to fetch patients by doctor and update the page
+  document.getElementById("doctorSearchForm").addEventListener("submit", function(event) {
+    event.preventDefault();  // Prevent form submission
+
+    var doctorName = document.getElementById("doctorName").value;
+    if (doctorName) {
+      fetchPatientsByDoctor(doctorName);
+    }
+  });
+
+  function fetchPatientsByDoctor(doctorName) {
+    // Fetch patients from the API
+    fetch(`/api/doctors/patients-by-doctor?doctorName=${encodeURIComponent(doctorName)}`)
+            .then(response => response.json())
+            .then(data => {
+              displayPatients(data, doctorName);
+            })
+            .catch(error => {
+              console.error("Error fetching patients:", error);
+            });
+  }
+
+  function displayPatients(patients, doctorName) {
+    // Hide the no patients message and table initially
+    document.getElementById("noPatientsMessage").style.display = "none";
+    document.getElementById("patientsTable").style.display = "none";
+
+    // Update the title with the selected doctor's name
+    document.getElementById("doctorNameDisplay").textContent = doctorName;
+    document.getElementById("patientsTitle").style.display = "block";
+
+    // If no patients are returned, show the no patients message
+    if (patients.length === 0) {
+      document.getElementById("noPatientsMessage").style.display = "block";
+    } else {
+      // Populate the table with patient names
+      var patientsBody = document.getElementById("patientsBody");
+      patientsBody.innerHTML = "";  // Clear previous patient rows
+
+      patients.forEach(function(patient) {
+        var row = document.createElement("tr");
+        var cell = document.createElement("td");
+        cell.textContent = patient;  // Directly display the patient name from the array
+        row.appendChild(cell);
+        patientsBody.appendChild(row);
+      });
+
+      // Show the table
+      document.getElementById("patientsTable").style.display = "block";
+    }
+  }
+</script>
+
+</body>
+</html>

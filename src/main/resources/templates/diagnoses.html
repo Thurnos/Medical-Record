@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medical Portal - Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: #f4f9ff;
+    }
+
+    /* Navbar Styles */
+    .navbar {
+      background-color: #005bb5; /* Slightly darker blue for better depth */
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+    }
+
+    .navbar a:hover {
+      text-decoration: underline;
+    }
+
+    .navbar .right a {
+      margin-left: 15px;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: #0066cc; /* Slightly darker blue */
+      color: white;
+      padding: 60px 20px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+    }
+
+    /* Container for the content */
+    .container {
+      background: #fff;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      max-width: 900px;
+      margin: 30px auto;
+    }
+
+    h2 {
+      color: #0066cc;
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    /* Section for statistics and cards */
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: #e6f7ff;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      width: 30%;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-card h3 {
+      color: #0066cc;
+      font-size: 2rem;
+    }
+
+    .stat-card p {
+      font-size: 1.2rem;
+      color: #333;
+    }
+
+    /* Table Styling */
+    #diagnoses-list {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .diagnosis-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f0f8ff;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .diagnosis-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #0066cc;
+    }
+
+
+    .diagnosis-count {
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: white;
+      background: #0066cc;
+      padding: 5px 15px;
+      border-radius: 20px;
+    }
+
+    /* Footer Styles */
+    .footer {
+      background-color: #003d73; /* Darker blue for footer */
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+      box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .footer .address {
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+    }
+
+    .footer .buttons a {
+      background-color: #0066cc;
+      color: white;
+      padding: 10px 20px;
+      margin: 0 10px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
+
+    .footer .buttons a:hover {
+      background-color: #005bb5;
+    }
+
+    /* Loading and Error messages */
+    .loading, .error {
+      text-align: center;
+      font-size: 1.5rem;
+      color: #0066cc;
+    }
+
+    .error {
+      color: #f44336;
+    }
+  </style>
+</head>
+<body>
+<!-- Navbar -->
+<div class="navbar">
+  <div>
+    <a href="/">Home</a>
+    <a href="/patients">Patients</a>
+    <a href="/diagnoses">Diagnoses</a>
+    <a href="/contact">Contact</a>
+  </div>
+  <div class="right">
+    <a href="#" id="profile"><i class="fa fa-user-circle"></i> Profile</a>
+    <a href="#" id="login"><i class="fa fa-sign-in"></i> Login</a>
+  </div>
+</div>
+
+  <!-- Most Frequent Diagnoses -->
+  <h2>Most Frequent Diagnoses</h2>
+  <div id="message" class="loading">Loading...</div>
+  <ul id="diagnoses-list"></ul>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <div class="address">
+    <p>123 Medical Ave, Suite 100, Health City, HC 12345</p>
+  </div>
+  <div class="buttons">
+    <a href="#">About</a>
+    <a href="#">FAQ</a>
+    <a href="#">Contact</a>
+  </div>
+  <p>&copy; 2024 Medical Record System. All Rights Reserved.</p>
+</div>
+
+<script>
+  // Fetching the most frequent diagnoses from the API
+  fetch('/api/diagnoses/most-frequent')
+          .then(response => response.json())
+          .then(data => {
+            const diagnosesList = document.getElementById('diagnoses-list');
+            const message = document.getElementById('message');
+            message.style.display = 'none'; // Hide the loading message
+
+            if (data.length === 0) {
+              message.textContent = 'No data available.';
+              message.classList.remove('loading');
+              message.classList.add('error');
+              message.style.display = 'block';
+              return;
+            }
+
+            // Loop through the data and create styled list items
+            data.forEach(item => {
+              const listItem = document.createElement('li');
+              listItem.classList.add('diagnosis-item');
+
+              const diagnosisName = document.createElement('span');
+              diagnosisName.classList.add('diagnosis-name');
+              diagnosisName.textContent = item[0]; // Diagnosis name
+
+              const diagnosisCount = document.createElement('span');
+              diagnosisCount.classList.add('diagnosis-count');
+              diagnosisCount.textContent = item[1]; // Diagnosis count
+
+              listItem.appendChild(diagnosisName);
+              listItem.appendChild(diagnosisCount);
+              diagnosesList.appendChild(listItem);
+            });
+          })
+          .catch(error => {
+            console.error('Error fetching data:', error);
+            const message = document.getElementById('message');
+            message.textContent = 'Failed to load data.';
+            message.classList.remove('loading');
+            message.classList.add('error');
+            message.style.display = 'block';
+          });
+</script>
+
+</body>
+</html>

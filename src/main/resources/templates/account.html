@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account - User Profile</title>
+    <!-- Add your CSS here, for example a link to a Bootstrap CDN -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Add some custom styling */
+        .profile-info {
+            margin-top: 20px;
+        }
+        .profile-info p {
+            font-size: 18px;
+        }
+        .profile-info span {
+            font-weight: bold;
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="mt-4">Account - User Profile</h2>
+
+    <!-- Error message container -->
+    <div id="error-message" class="error-message"></div>
+
+    <div class="profile-info">
+        <!-- Display user profile information here -->
+        <p><strong>Full Name:</strong> <span id="full-name">Loading...</span></p>
+        <p><strong>Username:</strong> <span id="username">Loading...</span></p>
+        <p><strong>Email:</strong> <span id="email">Loading...</span></p>
+        <p><strong>Role:</strong> <span id="role">Loading...</span></p>
+
+        <!-- Edit Profile Button -->
+        <button id="edit-profile" class="btn btn-primary mt-3">Edit Profile</button>
+    </div>
+</div>
+
+<!-- Add your JavaScript here -->
+<script>
+    // Function to fetch user data from the API after login
+    async function fetchUserData() {
+        // Ensure the user is authenticated
+        const token = localStorage.getItem('authToken'); // assuming you're using JWT stored in localStorage
+        if (!token) {
+            window.location.href = "/login"; // redirect to login page if no token
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/users', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}` // Sending JWT token in Authorization header
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch user data');
+            }
+
+            const userData = await response.json();
+            displayUserData(userData);
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+            alert('Error fetching user data');
+        }
+    }
+
+    // Function to display user data
+    function displayUserData(userData) {
+        const userContainer = document.getElementById('user-info');
+        userContainer.innerHTML = `
+                <p>Name: ${userData.name}</p>
+                <p>Email: ${userData.email}</p>
+                <p>Username: ${userData.username}</p>
+                <!-- Add more fields as per the user data -->
+            `;
+    }
+
+    // Call the function when the page loads
+    window.onload = function() {
+        fetchUserData();
+    };
+</script>
+
+<!-- Include Bootstrap JS (Optional) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

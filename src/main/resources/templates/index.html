@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Portal - Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f4f9ff;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background-color: #005bb5; /* Slightly darker blue for better depth */
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        .navbar .right a {
+            margin-left: 15px;
+        }
+
+        /* Dropdown styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropbtn {
+            background-color: #005bb5;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none; /* Hidden by default */
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 400px; /* Adjusted width for two columns */
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            padding: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            grid-template-columns: 1fr 1fr; /* Two equal-width columns */
+            gap: 10px;
+        }
+
+        .dropdown-content a {
+            color: #005bb5;
+            padding: 8px 12px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #e6f7ff;
+        }
+
+        /* Show dropdown content on hover */
+        .dropdown:hover .dropdown-content {
+            display: grid; /* Display as grid when hovering */
+        }
+
+        /* Hero Section */
+        .hero {
+            background: #0066cc; /* Slightly darker blue */
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+        }
+
+        /* Container for the content */
+        .container {
+            background: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 900px;
+            margin: 30px auto;
+        }
+
+        h2 {
+            color: #0066cc;
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        /* Section for statistics and cards */
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #e6f7ff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 30%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            color: #0066cc;
+            font-size: 2rem;
+        }
+
+        .stat-card p {
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        /* Table Styling */
+        #diagnoses-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .diagnosis-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f0f8ff;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .diagnosis-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #0066cc;
+        }
+
+
+        .diagnosis-count {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: white;
+            background: #0066cc;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        /* Footer Styles */
+        .footer {
+            background-color: #003d73; /* Darker blue for footer */
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer .address {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .footer .buttons a {
+            background-color: #0066cc;
+            color: white;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .footer .buttons a:hover {
+            background-color: #005bb5;
+        }
+
+        /* Loading and Error messages */
+        .loading, .error {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #0066cc;
+        }
+
+        .error {
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<!-- Navbar -->
+<div class="navbar">
+    <div>
+        <a href="/">Home</a>
+        <a href="/patients">Patients</a>
+        <a href="/diagnoses">Diagnoses</a>
+
+        <!-- Dropdown Menu for APIs -->
+        <div class="dropdown" >
+            <button class="dropbtn">APIs</button>
+            <div class="dropdown-content">
+                <a href="http://localhost:8080/api/diagnoses/patients-diagnoses?diagnosisText=Asthma" target="_blank">
+                    List of patients with a given diagnosis
+                </a>
+                <a href="http://localhost:8080/api/diagnoses/most-frequent" target="_blank">
+                    Information about the most frequent diagnoses
+                </a>
+                <a href="http://localhost:8080/api/doctors/patients-by-doctor?doctorName=Maria%20Ivanova" target="_blank">
+                    List of patients who have a given personal doctor
+                </a>
+                <a href="http://localhost:8080/api/doctors/patient-counts" target="_blank">
+                    Number of patients assigned to each personal doctor
+                </a>
+                <a href="http://localhost:8080/api/doctors/visit-counts" target="_blank">
+                    Number of visits for each doctor
+                </a>
+                <a href="http://localhost:8080/api/visits" target="_blank">
+                    List of visits for each patient
+                </a>
+                <a href="http://localhost:8080/api/visits/date-range?startDate=2024-12-01&endDate=2024-12-31" target="_blank">
+                    List of visits for all doctors within a given period
+                </a>
+                <a href="http://localhost:8080/api/visits/by-doctor-date-range?doctorId=1&startDate=2024-01-01&endDate=2024-12-31" target="_blank">
+                    List of visits for a specific doctor within a given period
+                </a>
+                <a href="http://localhost:8080/api/sick-leaves/most-sick-leaves-month " target="_blank">
+                    Information about the month of the year with the most sick leaves issued
+                </a>
+                <a href="http://localhost:8080/api/sick-leaves/doctor-sick-leave-counts" target="_blank">
+                    Information about the doctor/ doctors who issued the most sick leaves
+                </a>
+                <a href="http://localhost:8080/api/reporting/statistics" target="_blank">
+                    Reporting statistics
+                </a>
+                <a href="http://localhost:8080/api/patients/all-patients-history" target="_blank">
+                    Patients full medical history
+                </a>
+                <a href="http://localhost:8080/api/patients/1/history" target="_blank">
+                    Patients own medical history
+                </a>
+            </div>
+        </div>
+
+        <!-- Dropdown Menu for Frontend Views -->
+        <div class="dropdown">
+            <button class="dropbtn">Frontend Views</button>
+            <div class="dropdown-content">
+                <a href="http://localhost:8080/search" target="_blank">
+                    Search for Patients by Diagnosis
+                </a>
+                <a href="http://localhost:8080/diagnoses/most-frequent" target="_blank">
+                    Most Frequent Diagnoses View
+                </a>
+                <a href="http://localhost:8080/visits/by-doctor-date-range" target="_blank">
+                    List of visits for all doctors within a given period
+                </a>
+                <a href="http://localhost:8080/sick-leaves" target="_blank">
+                    Most Sick Leaves Issued
+                </a>
+                <a href="http://localhost:8080/patients-by-doctor" target="_blank">
+                    List of People assigned to doctors
+                </a>
+                <a href="http://localhost:8080/visit-counts" target="_blank">
+                    Visit Counts by Doctor
+                </a>
+                <a href="http://localhost:8080/visits-by-date" target="_blank">
+                    Visits by date
+                </a>
+                <a href="http://localhost:8080/patient-counts" target="_blank">
+                    Patient Counts
+                </a>
+                <a href="http://localhost:8080/visits" target="_blank">
+                    List of visits
+                </a>
+                <a href="http://localhost:8080/reports/statistics" target="_blank">
+                    Summarized Data Report
+                </a>
+                <a href="http://localhost:8080/patients/history" target="_blank">
+                    Patients full medical history
+                </a>
+                <a href="http://localhost:8080/patient-history" target="_blank">
+                    Patients Own Medical History
+                </a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <button class="dropbtn">CRUD</button>
+            <div class="dropdown-content">
+                <a href="http://localhost:8080/diagnose-crud" target="_blank">
+                    CRUD Diagnoses
+                </a>
+                <a href="http://localhost:8080/diagnose-crud" target="_blank">
+                    CRUD Doctors
+                </a>
+                <a href="http://localhost:8080/diagnose-crud" target="_blank">
+                    CRUD Patients
+                </a>
+                <a href="http://localhost:8080/diagnose-crud" target="_blank">
+                    CRUD Visits
+                </a>
+                <a href="http://localhost:8080/diagnose-crud" target="_blank">
+                    CRUD Sick Leaves
+                </a>
+            </div>
+        </div>
+
+        <a href="/contact">Contact</a>
+    </div>
+    <div class="right">
+        <a href="#" id="profile"><i class="fa fa-user-circle"></i> Profile</a>
+        <a href="#" id="login"><i class="fa fa-sign-in"></i> Login</a>
+        <a href="#" id="logout" style="display:none;"><i class="fa fa-sign-out-alt"></i> Logout</a>
+    </div>
+</div>
+
+<!-- Hero Section -->
+<div class="hero">
+    <h1>Welcome to the Medical Portal</h1>
+    <p>Your one-stop solution for patient records, diagnoses, and healthcare insights.</p>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+    <h2>Explore the Latest Medical Insights</h2>
+
+    <!-- Statistics Section -->
+    <div class="stats">
+        <div class="stat-card">
+            <h3>500+</h3>
+            <p>Registered Patients</p>
+        </div>
+        <div class="stat-card">
+            <h3>200+</h3>
+            <p>Available Diagnoses</p>
+        </div>
+        <div class="stat-card">
+            <h3>100+</h3>
+            <p>Doctors Available</p>
+        </div>
+    </div>
+
+    <!-- Most Frequent Diagnoses -->
+    <h2>Most Frequent Diagnoses</h2>
+    <div id="message" class="loading">Loading...</div>
+    <ul id="diagnoses-list"></ul>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <div class="address">
+        <p>123 Medical Ave, Suite 100, Health City, HC 12345</p>
+    </div>
+    <div class="buttons">
+        <a href="#">About</a>
+        <a href="#">FAQ</a>
+        <a href="#">Contact</a>
+    </div>
+    <p>&copy; 2024 Medical Record System. All Rights Reserved.</p>
+</div>
+
+<script>
+
+    // Fetching the most frequent diagnoses from the API
+    fetch('/api/diagnoses/most-frequent')
+        .then(response => response.json())
+        .then(data => {
+            const diagnosesList = document.getElementById('diagnoses-list');
+            const message = document.getElementById('message');
+            message.style.display = 'none'; // Hide the loading message
+
+            if (data.length === 0) {
+                message.textContent = 'No data available.';
+                message.classList.remove('loading');
+                message.classList.add('error');
+                message.style.display = 'block';
+                return;
+            }
+
+            // Loop through the data and create styled list items
+            data.forEach(item => {
+                const listItem = document.createElement('li');
+                listItem.classList.add('diagnosis-item');
+
+                const diagnosisName = document.createElement('span');
+                diagnosisName.classList.add('diagnosis-name');
+                diagnosisName.textContent = item[0]; // Diagnosis name
+
+                const diagnosisCount = document.createElement('span');
+                diagnosisCount.classList.add('diagnosis-count');
+                diagnosisCount.textContent = item[1]; // Diagnosis count
+
+                listItem.appendChild(diagnosisName);
+                listItem.appendChild(diagnosisCount);
+                diagnosesList.appendChild(listItem);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            const message = document.getElementById('message');
+            message.textContent = 'Failed to load data.';
+            message.classList.remove('loading');
+            message.classList.add('error');
+            message.style.display = 'block';
+        });
+
+
+
+    document.getElementById('logout').addEventListener('click', function (event) {
+        event.preventDefault();
+
+        // Send a request to the backend to invalidate the session or token
+        fetch('/logout', { method: 'POST' }) // Assuming a POST method for logout
+            .then(response => {
+                if (response.ok) {
+                    // Update the UI to show login link and hide logout link
+                    document.getElementById('login').style.display = 'block';
+                    document.getElementById('logout').style.display = 'none';
+                    // Optionally, redirect user to the login page or home page
+                    window.location.href = '/';
+                } else {
+                    console.error('Failed to log out.');
+                }
+            })
+            .catch(error => console.error('Error logging out:', error));
+    });
+
+    // Update UI based on whether the user is logged in or not
+    function updateUserInterface(loggedIn) {
+        if (loggedIn) {
+            document.getElementById('profile').style.display = 'block';
+            document.getElementById('logout').style.display = 'block';
+            document.getElementById('login').style.display = 'none';
+        } else {
+            document.getElementById('login').style.display = 'block';
+            document.getElementById('profile').style.display = 'none';
+            document.getElementById('logout').style.display = 'none';
+        }
+    }
+
+    // Call this function after checking user authentication status on page load
+    updateUserInterface(true); // Assuming logged-in state is `true` for now
+
+</script>
+
+</body>
+</html>

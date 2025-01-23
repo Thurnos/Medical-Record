@@ -1,0 +1,439 @@
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--  <title>Create Diagnose</title>-->
+<!--  <style>-->
+<!--    body {-->
+<!--      font-family: 'Roboto', sans-serif;-->
+<!--      background-color: #f2f9ff;-->
+<!--      display: flex;-->
+<!--      align-items: center;-->
+<!--      justify-content: center;-->
+<!--      height: 100vh;-->
+<!--      margin: 0;-->
+<!--    }-->
+<!--    .container {-->
+<!--      background: #fff;-->
+<!--      padding: 30px;-->
+<!--      border-radius: 12px;-->
+<!--      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);-->
+<!--      width: 90%;-->
+<!--      max-width: 400px;-->
+<!--    }-->
+<!--    h1 {-->
+<!--      color: #0056b3;-->
+<!--      margin-bottom: 20px;-->
+<!--    }-->
+<!--    label {-->
+<!--      display: block;-->
+<!--      margin-bottom: 8px;-->
+<!--      font-weight: bold;-->
+<!--    }-->
+<!--    input, textarea, button {-->
+<!--      width: 100%;-->
+<!--      padding: 10px;-->
+<!--      margin-bottom: 15px;-->
+<!--      border: 1px solid #ccc;-->
+<!--      border-radius: 5px;-->
+<!--    }-->
+<!--    button {-->
+<!--      background-color: #007BFF;-->
+<!--      color: white;-->
+<!--      font-size: 1rem;-->
+<!--      border: none;-->
+<!--      cursor: pointer;-->
+<!--    }-->
+<!--    button:hover {-->
+<!--      background-color: #0056b3;-->
+<!--    }-->
+<!--    #message {-->
+<!--      font-weight: bold;-->
+<!--      margin-top: 10px;-->
+<!--    }-->
+<!--    .success {-->
+<!--      color: green;-->
+<!--    }-->
+<!--    .error {-->
+<!--      color: red;-->
+<!--    }-->
+<!--  </style>-->
+<!--</head>-->
+<!--<body>-->
+
+<!--<div class="container">-->
+<!--  <h1>Create Diagnose</h1>-->
+<!--  <form id="diagnoseForm">-->
+<!--    <label for="visitId">Visit ID:</label>-->
+<!--    <input type="number" id="visitId" name="visitId" required placeholder="Enter Visit ID">-->
+
+<!--    <label for="diagnosisText">Diagnosis:</label>-->
+<!--    <textarea id="diagnosisText" name="diagnosisText" required placeholder="Enter Diagnosis"></textarea>-->
+
+<!--    <button type="submit">Save Diagnose</button>-->
+<!--  </form>-->
+
+<!--  <div id="message" class=""></div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--  document.getElementById('diagnoseForm').addEventListener('submit', function(event) {-->
+<!--    event.preventDefault(); // Prevent the default form submission-->
+
+<!--    const visitId = document.getElementById('visitId').value;-->
+<!--    const diagnosisText = document.getElementById('diagnosisText').value;-->
+
+<!--    // Clear previous messages-->
+<!--    const messageDiv = document.getElementById('message');-->
+<!--    messageDiv.className = '';-->
+<!--    messageDiv.textContent = '';-->
+
+<!--    // Validate form inputs-->
+<!--    if (!visitId || !diagnosisText) {-->
+<!--      messageDiv.textContent = 'All fields are required.';-->
+<!--      messageDiv.className = 'error';-->
+<!--      return;-->
+<!--    }-->
+
+<!--    // Send data via AJAX (fetch API)-->
+<!--    fetch('/api/diagnoses', {-->
+<!--      method: 'POST',-->
+<!--      headers: {-->
+<!--        'Content-Type': 'application/x-www-form-urlencoded',-->
+<!--      },-->
+<!--      body: new URLSearchParams({-->
+<!--        visitId: visitId,-->
+<!--        diagnosisText: diagnosisText,-->
+<!--      }),-->
+<!--    })-->
+<!--            .then(response => {-->
+<!--              if (response.ok) {-->
+<!--                return response.text(); // Get the success message from the server-->
+<!--              } else {-->
+<!--                throw new Error('Failed to save the diagnosis.');-->
+<!--              }-->
+<!--            })-->
+<!--            .then(successMessage => {-->
+<!--              messageDiv.textContent = successMessage;-->
+<!--              messageDiv.className = 'success';-->
+<!--              document.getElementById('diagnoseForm').reset(); // Clear form inputs-->
+<!--            })-->
+<!--            .catch(error => {-->
+<!--              messageDiv.textContent = error.message;-->
+<!--              messageDiv.className = 'error';-->
+<!--            });-->
+<!--  });-->
+<!--</script>-->
+
+<!--</body>-->
+<!--</html>-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Diagnoses Management</title>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f2f9ff;
+      padding: 20px;
+    }
+    .container {
+      margin: 0 auto;
+      max-width: 800px;
+    }
+    h1 {
+      color: #0056b3;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .form-section, .list-section {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    table th, table td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+    table th {
+      background-color: #f4f4f4;
+    }
+    .actions button {
+      margin-right: 5px;
+    }
+    #message {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Diagnoses Management</h1>
+
+  <!-- Form Section -->
+  <div class="form-section">
+    <h2>Create Diagnosis</h2>
+    <form id="diagnoseForm">
+      <label for="visitId">Visit ID:</label>
+      <input type="number" id="visitId" name="visitId" required placeholder="Enter Visit ID">
+
+      <label for="diagnosisText">Diagnosis:</label>
+      <textarea id="diagnosisText" name="diagnosisText" required placeholder="Enter Diagnosis"></textarea>
+
+      <button type="submit">Save Diagnosis</button>
+    </form>
+
+    <div id="message" class=""></div>
+  </div>
+
+  <!-- List Section -->
+  <div class="list-section">
+    <h2>All Diagnoses</h2>
+    <table>
+      <thead>
+      <tr>
+        <th>Diagnosis ID</th>
+        <th>Visit ID</th>
+        <th>Diagnosis Text</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody id="diagnosesTableBody">
+      <!-- Diagnoses will be dynamically loaded here -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  // Function to fetch and display all diagnoses
+  // Track the current editing diagnosis ID
+  let currentEditingDiagnosisId = null;
+
+  // Handle form submission
+  document.getElementById('diagnoseForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    const visitId = document.getElementById('visitId').value;
+    const diagnosisText = document.getElementById('diagnosisText').value;
+
+    // Clear previous messages
+    const messageDiv = document.getElementById('message');
+    messageDiv.className = '';
+    messageDiv.textContent = '';
+
+    // Validate form inputs
+    if (!visitId || !diagnosisText) {
+      messageDiv.textContent = 'All fields are required.';
+      messageDiv.className = 'error';
+      return;
+    }
+
+    // Check if editing or creating
+    if (currentEditingDiagnosisId) {
+      // Update existing diagnosis
+      fetch(`/api/diagnoses/${currentEditingDiagnosisId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ visitId, diagnosisText }),
+      })
+              .then(response => {
+                if (response.ok) {
+                  return response.text();
+                } else {
+                  throw new Error('Failed to update the diagnosis.');
+                }
+              })
+              .then(successMessage => {
+                messageDiv.textContent = successMessage || 'Diagnosis updated successfully.';
+                messageDiv.className = 'success';
+                currentEditingDiagnosisId = null; // Reset editing state
+                document.getElementById('diagnoseForm').reset();
+                loadDiagnoses(); // Reload diagnoses list
+              })
+              .catch(error => {
+                messageDiv.textContent = error.message;
+                messageDiv.className = 'error';
+              });
+    } else {
+      // Create new diagnosis
+      fetch('/api/diagnoses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          visitId: visitId,
+          diagnosisText: diagnosisText,
+        }),
+      })
+              .then(response => {
+                if (response.ok) {
+                  return response.text(); // Get the success message from the server
+                } else {
+                  throw new Error('Failed to save the diagnosis.');
+                }
+              })
+              .then(successMessage => {
+                messageDiv.textContent = successMessage || 'Diagnosis saved successfully.';
+                messageDiv.className = 'success';
+                document.getElementById('diagnoseForm').reset(); // Clear form inputs
+                loadDiagnoses(); // Reload diagnoses list
+              })
+              .catch(error => {
+                messageDiv.textContent = error.message;
+                messageDiv.className = 'error';
+              });
+    }
+  });
+  function loadDiagnoses() {
+    fetch('/api/diagnoses')
+            .then(response => response.json())
+            .then(diagnoses => {
+              const tableBody = document.getElementById('diagnosesTableBody');
+              tableBody.innerHTML = ''; // Clear existing rows
+
+              diagnoses.forEach(diagnose => {
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+            <td>${diagnose.diagnosisId}</td>
+            <td>${diagnose.visitId}</td>
+            <td>${diagnose.diagnosisText}</td>
+            <td class="actions">
+              <button onclick="editDiagnose(${diagnose.diagnosisId})">Edit</button>
+              <button onclick="deleteDiagnose(${diagnose.diagnosisId})">Delete</button>
+            </td>
+          `;
+
+                tableBody.appendChild(row);
+              });
+            })
+            .catch(error => {
+              console.error('Error loading diagnoses:', error);
+              const messageDiv = document.getElementById('message');
+              messageDiv.textContent = 'Failed to load diagnoses.';
+              messageDiv.className = 'error';
+            });
+  }
+
+  // Handle form submission for creating a new diagnosis
+  document.getElementById('diagnoseForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const visitId = document.getElementById('visitId').value;
+    const diagnosisText = document.getElementById('diagnosisText').value;
+    const messageDiv = document.getElementById('message');
+    messageDiv.className = '';
+    messageDiv.textContent = '';
+
+    fetch('/api/diagnoses', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ visitId, diagnosisText }),
+    })
+            .then(response => {
+              if (response.ok) {
+                messageDiv.textContent = 'Diagnosis saved successfully.';
+                messageDiv.className = 'success';
+                document.getElementById('diagnoseForm').reset();
+                loadDiagnoses(); // Reload the diagnoses
+              } else {
+                throw new Error('Failed to save the diagnosis.');
+              }
+            })
+            .catch(error => {
+              messageDiv.textContent = error.message;
+              messageDiv.className = 'error';
+            });
+  });
+
+  // Edit diagnosis (stub function for now)
+  function editDiagnose(id) {
+    fetch(`/api/diagnoses/${id}`)
+            .then(response => {
+              if (response.ok) {
+                return response.json();
+              } else {
+                throw new Error('Failed to fetch the diagnosis details.');
+              }
+            })
+            .then(diagnose => {
+              // Populate the form with the diagnosis details
+              document.getElementById('visitId').value = diagnose.visitId;
+              document.getElementById('diagnosisText').value = diagnose.diagnosisText;
+
+              // Set the current editing diagnosis ID
+              currentEditingDiagnosisId = id;
+
+              // Update the form button text to indicate editing mode
+              document.querySelector('#diagnoseForm button').textContent = 'Update Diagnosis';
+            })
+            .catch(error => {
+              const messageDiv = document.getElementById('message');
+              messageDiv.textContent = error.message;
+              messageDiv.className = 'error';
+            });
+  }
+
+  // Delete diagnosis
+  function deleteDiagnose(id) {
+    fetch(`/api/diagnoses/${id}`, { method: 'DELETE' })
+            .then(response => {
+              if (response.ok) {
+                loadDiagnoses(); // Reload the diagnoses
+              } else {
+                throw new Error('Failed to delete the diagnosis.');
+              }
+            })
+            .catch(error => {
+              console.error('Error deleting diagnosis:', error);
+            });
+  }
+
+  // Load diagnoses on page load
+  window.onload = loadDiagnoses;
+</script>
+
+</body>
+</html>

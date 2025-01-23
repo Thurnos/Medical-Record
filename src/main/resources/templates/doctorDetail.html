@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Details</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>body {
+    font-family: Arial, sans-serif;
+  }
+
+  .container {
+    margin: 20px;
+  }
+
+  .doctor-cards {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .doctor-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    width: 200px;
+    margin: 10px;
+  }
+
+  .doctor-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 50%;
+  }
+
+  .doctor-detail-card {
+    text-align: center;
+  }
+
+  .doctor-detail-card img {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+  }
+
+  .doctor-detail-card h2 {
+    margin-top: 20px;
+  }
+
+  .doctor-detail-card ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 14px;
+  }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+  <ul>
+    <li><a href="/static">Home</a></li>
+    <li><a href="/visits">Visits</a></li>
+    <li><a href="/sick-leaves">Sick Leaves</a></li>
+  </ul>
+</nav>
+
+<!-- Doctor Details -->
+<div class="container">
+  <div class="doctor-detail-card">
+    <img src="/'/images/doctor{{doctor.id}}.jpg" alt="{{doctor.name}}" class="doctor-img" />
+    <h2>{{doctor.name}}</h2>
+    <p><strong>Personal Doctor: </strong>{{doctor.personalDoctor}}</p>
+
+    <h3>Qualifications</h3>
+    <ul>
+      <li th:each="qualification : ${doctor.qualifications}">
+        <p>{{qualification.qualificationName}}</p>
+      </li>
+    </ul>
+
+    <h3>Patient Count</h3>
+    <p>{{doctor.patientCount}} patients</p>
+
+    <!-- Add any other details you want to show for this doctor -->
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <p>&copy; 2024 Medical Record System. All Rights Reserved.</p>
+</footer>
+
+</body>
+</html>
+
+

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Patients' Medical History</title>
+    <style>
+        /* General Reset and Body Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 2.5rem;
+            letter-spacing: 1px;
+        }
+
+        footer {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .container {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 50px;
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            font-size: 1rem;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+
+        .patient-info {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        /* Responsive Table */
+        @media (max-width: 768px) {
+            table {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 12px;
+            }
+
+            header {
+                font-size: 2rem;
+            }
+
+            footer {
+                font-size: 0.9rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Header Section -->
+<header>
+    <h1>All Patients' Medical History</h1>
+</header>
+
+<!-- Main Content Section -->
+<div class="container">
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>Patient ID</th>
+                <th>Patient Name</th>
+                <th>Visit Date</th>
+                <th>Diagnosis</th>
+                <th>Treatment</th>
+                <th>Sick Leave Start</th>
+                <th>Sick Leave End</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Loop through the patients' history and display each entry -->
+            <tr th:each="history : ${patientsHistory}">
+                <td class="patient-info" th:text="${history[0]}"></td>  <!-- Patient ID -->
+                <td th:text="${history[1]}"></td>  <!-- Patient Name -->
+                <td th:text="${history[2]}"></td>  <!-- Visit Date -->
+                <td th:text="${history[3]}"></td>  <!-- Diagnosis -->
+                <td th:text="${history[4]}"></td>  <!-- Treatment -->
+                <td th:text="${history[5]}"></td>  <!-- Sick Leave Start -->
+                <td th:text="${history[6]}"></td>  <!-- Sick Leave End -->
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Footer Section -->
+<footer>
+    <p>&copy; 2025 Medical Record System | All Rights Reserved</p>
+</footer>
+
+</body>
+</html>

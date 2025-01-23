@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Doctors List</title>
+</head>
+<body>
+<h1>Doctors List</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Specialty</th>
+        <th>Personal Doctor</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="doctor : ${doctors}">
+        <td th:text="${doctor.doctorId}"></td>
+        <td th:text="${doctor.name}"></td>
+        <td th:text="${doctor.specialty}"></td>
+        <td th:text="${doctor.personalDoctor}"></td>
+        <td>
+            <a th:href="@{/doctor/edit/{id}(id=${doctor.doctorId})}">Edit</a>
+            <a th:href="@{/doctor/delete/{id}(id=${doctor.doctorId})}">Delete</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<a href="/doctor/create">Create New Doctor</a>
+
+</body>
+</html>

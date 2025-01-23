@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Counts by Doctor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #e6f2ff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .navbar {
+      background-color: #007BFF;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 800px;
+      margin: 30px auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #007BFF;
+      font-size: 2.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table th, table td {
+      border: 1px solid #ccc;
+      text-align: left;
+      padding: 10px;
+    }
+
+    table th {
+      background-color: #007BFF;
+      color: white;
+    }
+
+    table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    table tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    .action-buttons button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      margin-right: 5px;
+      cursor: pointer;
+    }
+
+    .action-buttons button:hover {
+      background-color: #0056b3;
+    }
+
+    #doctorList p {
+      font-size: 18px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+<div class="navbar">Patient Counts by Doctor</div>
+<div class="container mt-4">
+  <h1>Doctors and Their Patient Counts</h1>
+
+  <!-- Table for Doctor Patient Counts -->
+  <table class="table table-striped" id="patientCountTable">
+    <thead>
+    <tr>
+      <th>Doctor Name</th>
+      <th>Patient Count</th>
+    </tr>
+    </thead>
+    <tbody id="doctorList">
+    <!-- Data will be inserted here by JavaScript -->
+    <!-- Empty initially, will be populated by the JS script -->
+    </tbody>
+  </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function () {
+    // Fetch all doctors and their patient counts
+    $.get("/api/doctors/patient-counts", function (data) {
+      // Check if the API returned any data
+      if (Array.isArray(data) && data.length > 0) {
+        // Clear any existing content in the table body
+        $("#doctorList").empty();
+
+        // Loop through the response data and generate table rows
+        data.forEach(function (doctorPatient) {
+          const doctorName = doctorPatient.name || doctorPatient[0];  // Doctor's name
+          const patientCount = doctorPatient.count || doctorPatient[1];  // Patient count
+
+          // Create a table row with the doctor name and patient count
+          const tableRow = `<tr>
+                              <td>${doctorName}</td>
+                              <td>${patientCount}</td>
+                            </tr>`;
+
+          // Append the table row to the table body
+          $("#doctorList").append(tableRow);
+        });
+      } else {
+        // If no data is returned, display a message
+        $("#doctorList").html('<tr><td colspan="2">No doctors found or patient counts available.</td></tr>');
+      }
+    }).fail(function() {
+      alert("Error fetching doctor data. Please try again.");
+    });
+  });
+</script>
+</body>
+</html>

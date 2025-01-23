@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visit Date Range Search</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- For icons -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #003f7f;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    footer {
+      background-color: #003f7f;
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .container {
+      width: 80%;
+      margin: 0 auto;
+      padding: 30px;
+      background-color: white;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 2.5em;
+    }
+
+    .form-container {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    label {
+      font-weight: bold;
+      margin: 10px 0 5px;
+      display: block;
+    }
+
+    input[type="date"] {
+      padding: 10px;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background-color: #003f7f;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #005bb5;
+    }
+
+    .loading-spinner {
+      display: none;
+      text-align: center;
+      font-size: 1.5em;
+      color: #003f7f;
+    }
+
+    #visitResults {
+      margin-top: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #003f7f;
+      color: white;
+    }
+
+    tr:hover {
+      background-color: transparent;
+    }
+
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<!-- Header Section -->
+<header>
+  <h1>Search Visits by Date Range</h1>
+</header>
+
+<div class="container">
+  <!-- Form Container -->
+  <div class="form-container">
+    <form id="dateRangeForm">
+      <label for="startDate">Start Date:</label>
+      <input type="date" id="startDate" name="startDate" required>
+      <br>
+
+      <label for="endDate">End Date:</label>
+      <input type="date" id="endDate" name="endDate" required>
+      <br>
+
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-spinner">Loading...</div>
+
+  <!-- Visit Results Placeholder -->
+  <div id="visitResults"></div>
+</div>
+
+<!-- Footer Section -->
+<footer>
+  <p>&copy; 2025 Medical Record System | All Rights Reserved</p>
+</footer>
+
+<script>
+  $(document).ready(function() {
+    $("#dateRangeForm").on("submit", function(event) {
+      event.preventDefault();
+
+      const startDate = $("#startDate").val();
+      const endDate = $("#endDate").val();
+
+      if (!startDate || !endDate) {
+        alert("Please select both start and end dates.");
+        return;
+      }
+
+      $(".loading-spinner").show();
+
+      // Make the GET request to fetch visits within the date range
+      $.ajax({
+        url: `/api/visits/date-range?startDate=${startDate}&endDate=${endDate}`, //API URL
+        type: 'GET',
+        success: function(data) {
+          $(".loading-spinner").hide(); // Hide the loading spinner
+
+          if (data.length === 0) {
+            $("#visitResults").html("No visits found for the selected date range.");
+            return;
+          }
+
+          displayVisits(data);
+        },
+        error: function() {
+          $(".loading-spinner").hide();
+          alert("Error fetching visits. Please try again later.");
+        }
+      });
+    });
+
+    // Function to format the date from "2022-01-24T22:00:00.000+00:00" to "2022-01-24"
+    function formatDate(date) {
+      const parts = date.split("T");
+      return parts[0]; // Returns only the date part
+    }
+
+    // Function to display visit data in a table
+    function displayVisits(visits) {
+      let htmlContent = `
+        <h3>Visit Records:</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Visit ID</th>
+
+              <th>Visit Date</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      visits.forEach(function(visit) {
+        htmlContent += `
+          <tr>
+            <td>${visit.visitId}</td>
+            <td>${formatDate(visit.visitDate)}</td>
+          </tr>
+        `;
+      });
+
+      htmlContent += `
+          </tbody>
+        </table>
+      `;
+      $("#visitResults").html(htmlContent);
+    }
+  });
+</script>
+
+</body>
+</html>

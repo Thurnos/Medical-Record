@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        form { margin-bottom: 20px; }
+        .message { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Patient Management</h1>
+
+    <!-- Display messages -->
+    <div id="message" class="message"></div>
+    <div id="error" class="error"></div>
+
+    <!-- Patient Form -->
+    <form id="patientForm">
+        <input type="hidden" id="patientId"> <!-- Hidden input for patient ID -->
+
+        <label for="userId">User ID:</label>
+        <input type="number" id="userId" required><br><br>
+
+        <label for="name">Name:</label>
+        <input type="text" id="name" required><br><br>
+
+        <label for="egn">EGN:</label>
+        <input type="text" id="egn" maxlength="10" required><br><br>
+
+        <label for="isInsured">Is Insured:</label>
+        <select id="isInsured">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </select><br><br>
+
+        <label for="personalDoctorId">Personal Doctor ID:</label>
+        <input type="number" id="personalDoctorId"><br><br>
+
+        <button type="submit">Save Patient</button>
+        <button type="button" onclick="resetForm()">Cancel</button>
+    </form>
+
+    <hr>
+
+    <!-- Patient List -->
+    <h2>Patients List</h2>
+    <table id="patientTable">
+        <thead>
+        <tr>
+            <th>User ID</th>
+            <th>Name</th>
+            <th>EGN</th>
+            <th>Is Insured</th>
+            <th>Personal Doctor ID</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Patient rows will be populated here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    let editingPatientId = null;
+
+    // Display a message
+    function displayMessage(message, isError = false) {
+        const messageDiv = isError ? document.getElementById('error') : document.getElementById('message');
+        const otherDiv = isError ? document.getElementById('message') : document.getElementById('error');
+        messageDiv.textContent = message;
+        otherDiv.textContent = ''; // Clear the other message
+        setTimeout(() => { messageDiv.textContent = ''; }, 3000);
+    }
+
+    // Load patients
+    function loadPatients() {
+        fetch('/api/patients')
+            .then(response => response.json())
+            .then(patients => {
+                const tableBody = document.querySelector('#patientTable tbody');
+                tableBody.innerHTML = '';
+                patients.forEach(patient => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${patient.userId}</td>
+                        <td>${patient.name}</td>
+                        <td>${patient.egn}</td>
+                        <td>${patient.isInsured ? 'Yes' : 'No'}</td>
+                        <td>${patient.personalDoctorId || 'N/A'}</td>
+                        <td>
+                            <button onclick="editPatient(${patient.patientId})">Edit</button>
+                            <button onclick="deletePatient(${patient.patientId})">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(() => displayMessage('Failed to load patients.', true));
+    }
+
+    // Reset the form
+    function resetForm() {
+        editingPatientId = null;
+        document.getElementById('patientForm').reset();
+    }
+
+    // Create or update patient
+    document.getElementById('patientForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const patientData = {
+            patientId: editingPatientId, // Add patientId for edit
+            userId: document.getElementById('userId').value,
+            name: document.getElementById('name').value,
+            egn: document.getElementById('egn').value,
+            isInsured: document.getElementById('isInsured').value === '1',
+            personalDoctorId: document.getElementById('personalDoctorId').value || null
+        };
+
+        fetch('/api/patients', {
+            method: 'POST', // Always POST to /api/patients
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(patientData)
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to save patient.');
+            }
+            displayMessage(editingPatientId ? 'Patient updated successfully.' : 'Patient added successfully.');
+            resetForm();
+            loadPatients();
+        }).catch((error) => {
+            displayMessage(error.message, true);
+        });
+    });
+
+    // Edit patient
+    function editPatient(patientId) {
+        fetch('/api/patients')
+            .then(response => response.json())
+            .then(patients => {
+                const patient = patients.find(p => p.patientId === patientId);
+                if (patient) {
+                    editingPatientId = patient.patientId;
+                    document.getElementById('userId').value = patient.userId;
+                    document.getElementById('name').value = patient.name;
+                    document.getElementById('egn').value = patient.egn;
+                    document.getElementById('isInsured').value = patient.isInsured ? '1' : '0';
+                    document.getElementById('personalDoctorId').value = patient.personalDoctorId || '';
+                }
+            }).catch(() => displayMessage('Failed to load patient details.', true));
+    }
+
+    // Delete patient
+    function deletePatient(patientId) {
+        fetch('/api/patients', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ patientId })
+        }).then(response => {
+            if (response.ok) {
+                displayMessage('Patient deleted successfully.');
+                loadPatients();
+            } else {
+                throw new Error('Failed to delete patient.');
+            }
+        }).catch((error) => {
+            displayMessage(error.message, true);
+        });
+    }
+
+    // Initial load
+    loadPatients();
+</script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sick Leave Management</title>
+    <style>
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+
+<h1>Sick Leave Management</h1>
+
+<!-- Message display -->
+<div id="message"></div>
+
+<!-- Form for creating or updating a sick leave -->
+<form id="sickLeaveForm">
+    <label for="diagnosisId">Diagnosis ID: </label>
+    <input type="number" id="diagnosisId" required><br>
+
+    <label for="startDate">Start Date: </label>
+    <input type="date" id="startDate" required><br>
+
+    <label for="endDate">End Date: </label>
+    <input type="date" id="endDate" required><br>
+
+    <button type="submit">Save Sick Leave</button>
+</form>
+
+<!-- Table for displaying all sick leaves -->
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Diagnosis ID</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody id="sickLeavesTableBody">
+    </tbody>
+</table>
+
+<script>
+    let currentEditingSickLeaveId = null;
+
+    document.getElementById('sickLeaveForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        const diagnosisId = document.getElementById('diagnosisId').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        // Clear previous messages
+        const messageDiv = document.getElementById('message');
+        messageDiv.className = '';
+        messageDiv.textContent = '';
+
+        // Validate form inputs
+        if (!diagnosisId || !startDate || !endDate) {
+            messageDiv.textContent = 'All fields are required.';
+            messageDiv.className = 'error';
+            return;
+        }
+
+        // Create new sick leave
+        fetch('/api/sick-leaves/createSickLeave', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `diagnosisId=${diagnosisId}&startDate=${startDate}&endDate=${endDate}`,
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.text(); // Get the success message from the server
+                } else {
+                    throw new Error('Failed to save the sick leave.');
+                }
+            })
+            .then(successMessage => {
+                messageDiv.textContent = successMessage || 'Sick leave saved successfully.';
+                messageDiv.className = 'success';
+                document.getElementById('sickLeaveForm').reset(); // Clear form inputs
+                loadSickLeaves(); // Reload sick leaves list
+            })
+            .catch(error => {
+                messageDiv.textContent = error.message;
+                messageDiv.className = 'error';
+            });
+    });
+
+    // Load sick leaves
+    function loadSickLeaves() {
+        fetch('/api/sick-leaves')
+            .then(response => response.json())
+            .then(sickLeaves => {
+                const tableBody = document.getElementById('sickLeavesTableBody');
+                tableBody.innerHTML = ''; // Clear existing rows
+
+                sickLeaves.forEach(sickLeave => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+              <td>${sickLeave.sickLeaveId}</td>
+              <td>${sickLeave.diagnosisId}</td>
+              <td>${sickLeave.startDate}</td>
+              <td>${sickLeave.endDate}</td>
+              <td class="actions">
+                <button onclick="editSickLeave(${sickLeave.sickLeaveId})">Edit</button>
+                <button onclick="deleteSickLeave(${sickLeave.sickLeaveId})">Delete</button>
+              </td>
+            `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading sick leaves:', error);
+                const messageDiv = document.getElementById('message');
+                messageDiv.textContent = 'Failed to load sick leaves.';
+                messageDiv.className = 'error';
+            });
+    }
+
+    // Edit sick leave
+    function editSickLeave(id) {
+        currentEditingSickLeaveId = id;
+
+        fetch('/api/sick-leaves')
+            .then(response => response.json())
+            .then(sickLeaves => {
+                const sickLeave = sickLeaves.find(sickLeave => sickLeave.sickLeaveId === id);
+                if (sickLeave) {
+                    document.getElementById('diagnosisId').value = sickLeave.diagnosisId;
+                    document.getElementById('startDate').value = sickLeave.startDate;
+                    document.getElementById('endDate').value = sickLeave.endDate;
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching sick leave data:', error);
+            });
+    }
+
+    // Delete sick leave
+    function deleteSickLeave(id) {
+        fetch(`/api/sick-leaves/deleteSickLeave?sickLeaveId=${id}`, { method: 'POST' })
+            .then(response => {
+                if (response.ok) {
+                    loadSickLeaves(); // Reload the sick leaves
+                } else {
+                    throw new Error('Failed to delete the sick leave.');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting sick leave:', error);
+            });
+    }
+
+    // Load sick leaves on page load
+    window.onload = loadSickLeaves;
+</script>
+</body>
+</html>

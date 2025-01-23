@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient History</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: white;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .patient-selection {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .patient-selection input {
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .patient-selection button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .patient-selection button:hover {
+            background-color: #45a049;
+        }
+
+        .history-container {
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+
+        table td {
+            background-color: #fafafa;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        #patient-history p {
+            font-size: 18px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Patient History</h1>
+
+    <div class="patient-selection">
+        <label for="patient-id">Select Patient ID:</label>
+        <input type="number" id="patient-id" placeholder="Enter Patient ID" min="1" required>
+        <button id="fetch-history-btn">Get History</button>
+    </div>
+
+    <div id="patient-history" class="history-container">
+        <!-- Patient history will be displayed here -->
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#fetch-history-btn').click(function() {
+            var patientId = $('#patient-id').val();
+            if (patientId) {
+                $.get("/api/patients/" + patientId + "/history", function(data) {
+                    if (data.length > 0) {
+                        var historyHtml = "<h2>History for Patient ID: " + patientId + "</h2><table><thead><tr><th>Visit Date</th><th>Diagnosis</th><th>Treatment</th><th>Sick Leave</th></tr></thead><tbody>";
+                        data.forEach(function(record) {
+                            historyHtml += "<tr><td>" + record[0] + "</td><td>" + record[1] + "</td><td>" + record[2] + "</td><td>" + (record[3] ? record[3] : 'N/A') + " to " + (record[4] ? record[4] : 'N/A') + "</td></tr>";
+                        });
+                        historyHtml += "</tbody></table>";
+                        $('#patient-history').html(historyHtml);
+                    } else {
+                        $('#patient-history').html("<p>No history found for this patient.</p>");
+                    }
+                }).fail(function() {
+                    $('#patient-history').html("<p>Error fetching patient history. Please try again later.</p>");
+                });
+            } else {
+                alert("Please enter a patient ID.");
+            }
+        });
+    });
+</script>
+</body>
+</html>
