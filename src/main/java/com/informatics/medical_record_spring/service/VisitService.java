@@ -28,6 +28,8 @@ public class VisitService {
         return visit;
     }
 
+    // Delete a visit
+
     public void deleteVisit(Integer id) {
         String sql = "DELETE FROM visits WHERE visit_id = ?";
         jdbcTemplate.update(sql, id);
